@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import BoardCase from './KeyBoard';
 import shuffle from 'lodash.shuffle'
-const words = ['bonjour', 'chateau', 'voiture', 'gilets', 'jaunes'];
+const words = ['bonjour', 'chateau', 'voiture', 'philosophie', 'jetable', 'javascript'];
 var word = shuffle(words)
 
 class App extends Component {
@@ -15,24 +15,26 @@ class App extends Component {
       guesses: 0,
       winCondition: false
     }
-    console.log(word)
-
   }
+  
   letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
   handleKeyClick = (key) => {
+    this.feedback = "disabled"
     this.state.usedLetters.push(key)
     let word = this.state.word;
     let searchWord = word.replace(/\w/g,
       (letter) => (this.state.usedLetters.includes(letter) ? letter : '_')
     )
     this.setState({ searchWord: searchWord, usedLetters: this.state.usedLetters })
+    let guesses = this.state.guesses;
+    word === searchWord ? this.setState({ winCondition: true }) : this.setState ({ guesses: guesses += 1 });
     
   }
-  shouldComponentUpdate() {
-    let guesses = this.state.guesses;
-    this.state.word === this.state.searchWord ? this.setState({ winCondition: true }) : this.setState({ guesses: guesses += 1 });
+  getFeedbackForKey(letter) {
+    return this.state.usedLetters.includes(letter)? 'disabled' : ''
   }
+
   handleResetGame = () => {
     var word = shuffle(words)
     this.setState({
@@ -42,6 +44,7 @@ class App extends Component {
       guesses: 0,
       winCondition: false
     })
+
   }
 
 
@@ -54,10 +57,10 @@ class App extends Component {
         {!this.state.winCondition ? (<p>
           {this.letters.map((letter, index) => (
             < BoardCase
-              className="KeyB"
               key={index}
+              index={index}
+              feedback={this.getFeedbackForKey(letter)}
               letter={letter}
-              disabled={false}
               onClick={this.handleKeyClick}
             />
           )
